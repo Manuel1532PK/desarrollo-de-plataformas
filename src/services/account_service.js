@@ -112,4 +112,23 @@ exports.withdraw = async (withdrawData) => {
     }
 };
 
+// Realizar depósito
+exports.deposit = async (depositData) => {
+    try {
+        depositData = { usuario_id, monto, moneda, descripcion };
+        
+        // Verificar si existe billetera
+        const [billeteraRows] = await db.execute(
+            'SELECT ID_Billetera FROM Billeteras WHERE Usuarios_ID_Usuarios = ? AND Moneda = ?',
+            [usuario_id, moneda]
+        );
 
+        return billeteraRows
+        
+         // 1. Registrar transacción
+
+
+         } catch (error) {
+        throw new Error('Error en retiro: ' + error.message);
+    }
+};
