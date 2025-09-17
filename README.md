@@ -1,5 +1,3 @@
-Perfecto 🚀, aquí lo tienes en **Markdown listo para pegar en tu `README.md`**:
-
 ````markdown
 # 📌 Billetera Virtual Persona
 
