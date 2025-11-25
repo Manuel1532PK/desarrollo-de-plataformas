@@ -6,6 +6,7 @@ const transferenceRoutes = require('./routes/transference_routes');
 const SmartContractsRoutes = require('./routes/smartcontracts_routes');
 const cardRoutes = require('./routes/card_routes');
 const historialRoutes = require('./routes/history_routes');
+const path = require('path');
 require('dotenv').config();
 
 // Initialize express app
@@ -66,6 +67,9 @@ app.use((error, req, res, next) => {
 
 // Server configuration
 const PORT = process.env.PORT || 3000;
+
+// Servir archivos estáticos desde la carpeta uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 //Start Server
 app.listen(PORT, () => {

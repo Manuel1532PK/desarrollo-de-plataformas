@@ -13,15 +13,26 @@ exports.addCard = async (userId, cardData) => {
         }
 
         const [result] = await connection.execute(
-            'INSERT INTO Tarjetas_Registro (ID_Usuario, Tipo_tarjeta, Numero) VALUES (?, ?, ?)',
-            [userId, cardData.Tipo_tarjeta, cardData.Numero]
+            'INSERT INTO Tarjetas_Registro (ID_Usuario, Nombre, Tipo_tarjeta, Banco, Numero, Saldo) VALUES (?, ?, ?, ?, ?, ?)',
+            [
+                userId, 
+                cardData.Nombre,
+                cardData.Tipo_tarjeta, 
+                cardData.Banco,
+                cardData.Numero,
+                cardData.Saldo || 0.00
+            ]
         );
         
         return {
             ID_Tarjetas: result.insertId,
-            ID_Usuarios: userId,
+            ID_Usuario: userId,
+            Nombre: cardData.Nombre,
             Tipo_tarjeta: cardData.Tipo_tarjeta,
+            Banco: cardData.Banco,
             Numero: cardData.Numero,
+            Saldo: cardData.Saldo || 0.00,
+            Estado: 'Activa',
             mensaje: "Tarjeta registrada exitosamente"
         };
     } catch (error) {
@@ -34,7 +45,7 @@ exports.addCard = async (userId, cardData) => {
 exports.listCards = async (userId) => {
     try {
         const [rows] = await connection.execute(
-            'SELECT * FROM Tarjetas_Registro WHERE ID_Usuarios = ?',
+            'SELECT * FROM Tarjetas_Registro WHERE ID_Usuario = ? AND Estado = "Activa" ORDER BY Fecha_creacion DESC',
             [userId]
         );
         return rows;
@@ -48,8 +59,15 @@ exports.listCards = async (userId) => {
 exports.updateCard = async (cardId, cardData) => {
     try {
         await connection.execute(
-            'UPDATE Tarjetas_Registro SET Tipo_tarjeta = ?, Numero = ? WHERE ID_Tarjetas = ?',
-            [cardData.Tipo_tarjeta, cardData.Numero, cardId]
+            'UPDATE Tarjetas_Registro SET Nombre = ?, Tipo_tarjeta = ?, Banco = ?, Numero = ?, Saldo = ? WHERE ID_Tarjetas = ?',
+            [
+                cardData.Nombre,
+                cardData.Tipo_tarjeta, 
+                cardData.Banco,
+                cardData.Numero,
+                cardData.Saldo,
+                cardId
+            ]
         );
 
         // Obtener la tarjeta actualizada
@@ -59,16 +77,16 @@ exports.updateCard = async (cardId, cardData) => {
         );
         return rows[0];
     } catch (error) {
-        console.error('Error en actaulizar la tarjeta service:', error);
+        console.error('Error en actualizar la tarjeta service:', error);
         throw error;
     }
-}
+};
 
-// Eliminar tarjeta
+// Eliminar tarjeta (soft delete)
 exports.deleteCard = async (cardId) => {
     try {
         const [result] = await connection.execute(
-            'DELETE FROM Tarjetas_Registro WHERE ID_Tarjetas = ?',
+            'UPDATE Tarjetas_Registro SET Estado = "Inactiva" WHERE ID_Tarjetas = ?',
             [cardId]
         );
         
@@ -82,3 +100,16 @@ exports.deleteCard = async (cardId) => {
     }
 };
 
+// Obtener tarjeta por ID
+exports.getCardById = async (cardId) => {
+    try {
+        const [rows] = await connection.execute(
+            'SELECT * FROM Tarjetas_Registro WHERE ID_Tarjetas = ?',
+            [cardId]
+        );
+        return rows[0];
+    } catch (error) {
+        console.error('Error en getCardById service:', error);
+        throw error;
+    }
+};
