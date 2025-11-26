@@ -27,9 +27,13 @@ try:
           Correo VARCHAR(150) NOT NULL UNIQUE,
           Telefono VARCHAR(20) NOT NULL,
           Hash_Password VARCHAR(255) NOT NULL,
-          Pin_Seguridad VARCHAR(45) NOT NULL,
+          Pin_Seguridad VARCHAR(255) NOT NULL,
           Fecha_Registro DATETIME DEFAULT CURRENT_TIMESTAMP,
-          Estado VARCHAR(20) DEFAULT 'Activo'
+          Estado VARCHAR(20) DEFAULT 'Activo',
+          Verificado BOOLEAN DEFAULT FALSE,
+          Otp_Codigo VARCHAR(10) NULL,
+          Otp_Expira DATETIME NULL,
+          Imagen_Perfil VARCHAR(500) NULL
         )
         """
         cursor.execute(Create_Tabla_Usuarios)
@@ -113,12 +117,15 @@ try:
         Create_Tabla_Tarjeta_Registro="""
         CREATE TABLE IF NOT EXISTS Tarjetas_Registro (
           ID_Tarjetas INT AUTO_INCREMENT PRIMARY KEY,
+          Nombre VARCHAR(100) NOT NULL,
           Tipo_tarjeta VARCHAR(45) NOT NULL,
+          Banco VARCHAR(100) NOT NULL,
           Numero VARCHAR(45) NOT NULL UNIQUE,
+          Saldo FLOAT DEFAULT 0.0,
           ID_Usuario INT NOT NULL,
           FOREIGN KEY (ID_Usuario) REFERENCES Usuarios(ID_Usuarios)
-        )
-        """
+          )
+          """
         cursor.execute(Create_Tabla_Tarjeta_Registro)
 
 
@@ -139,7 +146,7 @@ try:
             IN p_correo VARCHAR(150), 
             IN p_telefono VARCHAR(20),
             IN p_hash_password VARCHAR(255),
-            IN p_pin_seguridad VARCHAR(45)
+            IN p_pin_seguridad VARCHAR(255)
         )
         BEGIN
             DECLARE nuevo_usuario_id INT;
